@@ -1,15 +1,32 @@
 import { Room, Client } from "@colyseus/core";
 import { MyRoomState, Player } from "./schema/MyRoomState";
 
+interface MovementPayload {
+  left: boolean;
+  right: boolean;
+  up: boolean;
+  down: boolean;
+}
+
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
   state = new MyRoomState();
 
   onCreate (options: any) {
-    this.onMessage("type", (client, message) => {
-      //
-      // handle "type" message
-      //
+    this.onMessage('movement', (client, payload: MovementPayload) => {
+      const player = this.state.players.get(client.sessionId);
+      const velocity = 2;
+
+      if (payload.left) {
+        player.x -= velocity;
+      } else if (payload.right) {
+        player.x += velocity;
+      }
+      if (payload.up) {
+        player.y -= velocity;
+      } else if (payload.down) {
+        player.y += velocity;
+      }
     });
   }
 
@@ -37,5 +54,4 @@ export class MyRoom extends Room<MyRoomState> {
   onDispose() {
     console.log("room", this.roomId, "disposing...");
   }
-
 }
