@@ -8,12 +8,18 @@ importers:
 
   .:
     dependencies:
+      '@colyseus/core':
+        specifier: ^0.16.16
+        version: 0.16.16(@colyseus/schema@3.0.33)
       '@colyseus/monitor':
         specifier: ^0.16.0
         version: 0.16.7
       '@colyseus/playground':
         specifier: ^0.16.0
         version: 0.16.3(@colyseus/auth@0.16.6(@colyseus/core@0.16.16(@colyseus/schema@3.0.33))(express@4.21.2))(@colyseus/core@0.16.16(@colyseus/schema@3.0.33))(express@4.21.2)
+      '@colyseus/schema':
+        specifier: ^3.0.33
+        version: 3.0.33
       '@colyseus/tools':
         specifier: ^0.16.0
         version: 0.16.4(@colyseus/core@0.16.16(@colyseus/schema@3.0.33))(@colyseus/ws-transport@0.16.4(@colyseus/core@0.16.16(@colyseus/schema@3.0.33)))
