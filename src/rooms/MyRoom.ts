@@ -1,36 +1,51 @@
 import { Room, Client } from "@colyseus/core";
-import { MyRoomState, Player } from "./schema/MyRoomState";
-
-interface MovementPayload {
-  left: boolean;
-  right: boolean;
-  up: boolean;
-  down: boolean;
-}
+import { MyRoomState, Player, MovementPayload } from "./schema/MyRoomState";
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
   state = new MyRoomState();
+  elapsedTime = 0;
+  fixedTimeStep = 1000 / 128;
 
-  onCreate (options: any) {
+  onCreate (_: any) {
     this.onMessage('movement', (client, payload: MovementPayload) => {
       const player = this.state.players.get(client.sessionId);
-      const velocity = 2;
 
-      if (payload.left) {
-        player.x -= velocity;
-      } else if (payload.right) {
-        player.x += velocity;
-      }
-      if (payload.up) {
-        player.y -= velocity;
-      } else if (payload.down) {
-        player.y += velocity;
+      player.inputQueue.push(payload);
+    });
+
+    this.setSimulationInterval((deltaTime) => {
+      this.elapsedTime += deltaTime;
+
+      while (this.elapsedTime >= this.fixedTimeStep) {
+        this.elapsedTime -= this.fixedTimeStep;
+        this.fixedTick(this.fixedTimeStep);
       }
     });
   }
 
-  onJoin(client: Client, options: any) {
+  fixedTick(_: number) {
+    const velocity = 2;
+
+    this.state.players.forEach((player) => {
+      let input: undefined | MovementPayload;
+      // dequeue player inputs
+      while (input = player.inputQueue.shift()) {
+        if (input.left) {
+          player.x -= velocity;
+        } else if (input.right) {
+          player.x += velocity;
+        }
+        if (input.up) {
+          player.y -= velocity;
+        } else if (input.down) {
+          player.y += velocity;
+        }
+      }
+    });
+  }
+
+  onJoin(client: Client, _: any) {
     console.log(client.sessionId, "joined!");
 
     const mapWidth = 1024;
@@ -45,7 +60,7 @@ export class MyRoom extends Room<MyRoomState> {
     this.state.players.set(client.sessionId, player);
   }
 
-  onLeave(client: Client, consented: boolean) {
+  onLeave(client: Client, _: boolean) {
     console.log(client.sessionId, "left!");
 
     this.state.players.delete(client.sessionId);
