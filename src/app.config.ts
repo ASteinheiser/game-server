@@ -5,7 +5,7 @@ import { playground } from "@colyseus/playground";
 /**
  * Import your Room files
  */
-import { MyRoom } from "./rooms/MyRoom";
+import { MyRoom, RESULTS } from "./rooms/MyRoom";
 
 export default config({
 
@@ -22,8 +22,8 @@ export default config({
          * Bind your custom express routes here:
          * Read more: https://expressjs.com/en/starter/basic-routing.html
          */
-        app.get("/hello_world", (req, res) => {
-            res.send("It's time to kick ass and chew bubblegum!");
+        app.get("/game-results", (req, res) => {
+            res.send(RESULTS);
         });
 
         /**
