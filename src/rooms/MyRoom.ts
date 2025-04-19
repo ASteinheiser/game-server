@@ -1,6 +1,9 @@
 import { Room, Client } from "@colyseus/core";
 import { MyRoomState, Player, InputPayload } from "./schema/MyRoomState";
 
+// TODO: fix this. Currrent solution is basically mocking a DB
+export const RESULTS: Array<{ username: string; attackCount: number }> = [];
+
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
   state = new MyRoomState();
@@ -42,13 +45,15 @@ export class MyRoom extends Room<MyRoomState> {
           player.y += velocity;
         }
 
-        if (input.attack) {
-          // TODO: implement attack logic
-          // probably calculate where the attack lands and if it hits an enemy
-        }
-
         player.isMoving = input.left || input.right || input.up || input.down;
         player.isAttacking = input.attack;
+
+        if (input.attack) {
+          player.attackCount++;
+
+          const playerResult = RESULTS.find(result => result.username === player?.username);
+          if (playerResult) playerResult.attackCount++;
+        }
       }
     });
   }
@@ -69,6 +74,8 @@ export class MyRoom extends Room<MyRoomState> {
     // place player in the map of players by its sessionId
     // (client.sessionId is unique per connection!)
     this.state.players.set(client.sessionId, player);
+
+    RESULTS.push({ username, attackCount: 0 });
   }
 
   onLeave(client: Client, _: boolean) {
@@ -81,5 +88,7 @@ export class MyRoom extends Room<MyRoomState> {
 
   onDispose() {
     console.log("room", this.roomId, "disposing...");
+
+    RESULTS.length = 0;
   }
 }
