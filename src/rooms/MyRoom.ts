@@ -41,10 +41,14 @@ export class MyRoom extends Room<MyRoomState> {
         } else if (input.down) {
           player.y += velocity;
         }
+
         if (input.attack) {
           // TODO: implement attack logic
           // probably calculate where the attack lands and if it hits an enemy
         }
+
+        player.isMoving = input.left || input.right || input.up || input.down;
+        player.isAttacking = input.attack;
       }
     });
   }
