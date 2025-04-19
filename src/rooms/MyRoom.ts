@@ -53,13 +53,16 @@ export class MyRoom extends Room<MyRoomState> {
     });
   }
 
-  onJoin(client: Client, _: any) {
-    console.log(client.sessionId, "joined!");
+  onJoin(client: Client, options: any) {
+    const username = options.username ?? `random-user-${Math.floor(Math.random() * 10000)}`;
+
+    console.log(`${username} (${client.sessionId}) joined!`);
 
     const mapWidth = 1024;
     const mapHeight = 768;
     const player = new Player();
 
+    player.username = username;
     player.x = (Math.random() * mapWidth);
     player.y = (Math.random() * mapHeight);
 
