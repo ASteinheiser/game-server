@@ -1,5 +1,5 @@
 import { Room, Client } from "@colyseus/core";
-import { MyRoomState, Player, MovementPayload } from "./schema/MyRoomState";
+import { MyRoomState, Player, InputPayload } from "./schema/MyRoomState";
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
@@ -8,7 +8,7 @@ export class MyRoom extends Room<MyRoomState> {
   fixedTimeStep = 1000 / 128;
 
   onCreate (_: any) {
-    this.onMessage('movement', (client, payload: MovementPayload) => {
+    this.onMessage('playerInput', (client, payload: InputPayload) => {
       const player = this.state.players.get(client.sessionId);
 
       player.inputQueue.push(payload);
@@ -28,7 +28,7 @@ export class MyRoom extends Room<MyRoomState> {
     const velocity = 2;
 
     this.state.players.forEach((player) => {
-      let input: undefined | MovementPayload;
+      let input: undefined | InputPayload;
       // dequeue player inputs
       while (input = player.inputQueue.shift()) {
         if (input.left) {
@@ -40,6 +40,10 @@ export class MyRoom extends Room<MyRoomState> {
           player.y -= velocity;
         } else if (input.down) {
           player.y += velocity;
+        }
+        if (input.attack) {
+          // TODO: implement attack logic
+          // probably calculate where the attack lands and if it hits an enemy
         }
       }
     });

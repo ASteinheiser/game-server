@@ -3,14 +3,15 @@ import { MapSchema, Schema, type } from "@colyseus/schema";
 export class Player extends Schema {
   @type("number") x: number;
   @type("number") y: number;
-  inputQueue: Array<MovementPayload> = [];
+  inputQueue: Array<InputPayload> = [];
 }
 
-export interface MovementPayload {
+export interface InputPayload {
   left: boolean;
   right: boolean;
   up: boolean;
   down: boolean;
+  attack: boolean;
 }
 
 export class MyRoomState extends Schema {
