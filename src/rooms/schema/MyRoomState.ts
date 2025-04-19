@@ -4,8 +4,9 @@ export class Player extends Schema {
   @type("string") username: string;
   @type("number") x: number;
   @type("number") y: number;
-  @type("boolean") isMoving: boolean;
-  @type("boolean") isAttacking: boolean;
+  @type("boolean") isMoving: boolean = false;
+  @type("boolean") isAttacking: boolean = false;
+  @type("number") attackCount: number = 0;
   inputQueue: Array<InputPayload> = [];
 }
 
