@@ -47,7 +47,6 @@ export class MyRoom extends Room<MyRoomState> {
           player.y += velocity;
         }
 
-        player.isMoving = input.left || input.right || input.up || input.down;
         player.isAttacking = input.attack;
 
         if (input.attack) {
