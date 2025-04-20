@@ -2,7 +2,9 @@ import { Room, Client } from "@colyseus/core";
 import { MyRoomState, Player, InputPayload } from "./schema/MyRoomState";
 
 // TODO: fix this. Currrent solution is basically mocking a DB
-export const RESULTS: Array<{ username: string; attackCount: number }> = [];
+export const RESULTS: Record<string, { username: string; attackCount: number }> = {};
+
+// TODO: always send attack input, then serverside track the cooldown
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
@@ -30,7 +32,7 @@ export class MyRoom extends Room<MyRoomState> {
   fixedTick(_: number) {
     const velocity = 2;
 
-    this.state.players.forEach((player) => {
+    this.state.players.forEach((player, sessionId) => {
       let input: undefined | InputPayload;
       // dequeue player inputs
       while (input = player.inputQueue.shift()) {
@@ -51,8 +53,7 @@ export class MyRoom extends Room<MyRoomState> {
         if (input.attack) {
           player.attackCount++;
 
-          const playerResult = RESULTS.find(result => result.username === player?.username);
-          if (playerResult) playerResult.attackCount++;
+          RESULTS[sessionId].attackCount++;
         }
       }
     });
@@ -75,7 +76,7 @@ export class MyRoom extends Room<MyRoomState> {
     // (client.sessionId is unique per connection!)
     this.state.players.set(client.sessionId, player);
 
-    RESULTS.push({ username, attackCount: 0 });
+    RESULTS[client.sessionId] = { username, attackCount: 0 };
   }
 
   onLeave(client: Client, _: boolean) {
@@ -89,6 +90,8 @@ export class MyRoom extends Room<MyRoomState> {
   onDispose() {
     console.log("room", this.roomId, "disposing...");
 
-    RESULTS.length = 0;
+    Object.keys(RESULTS).forEach((sessionId) => {
+      delete RESULTS[sessionId];
+    });
   }
 }
