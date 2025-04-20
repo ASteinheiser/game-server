@@ -53,7 +53,10 @@ export class MyRoom extends Room<MyRoomState> {
         const timeSinceLastAttack = currentTime - player.lastAttackTime;
         const canAttack = timeSinceLastAttack >= ATTACK_COOLDOWN_MS;
 
-        if (input.attack && canAttack) {
+        // if the player is mid-attack, don't process any more inputs
+        if (!canAttack) {
+          return;
+        } else if (input.attack) {
           player.isAttacking = true;
           player.attackCount++;
           player.lastAttackTime = currentTime;
