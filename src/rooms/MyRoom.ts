@@ -4,7 +4,8 @@ import { MyRoomState, Player, InputPayload } from "./schema/MyRoomState";
 // TODO: fix this. Currrent solution is basically mocking a DB
 export const RESULTS: Record<string, { username: string; attackCount: number }> = {};
 
-// TODO: always send attack input, then serverside track the cooldown
+// attack animation takes 0.675 seconds total (5 frames at 8fps)
+export const ATTACK_COOLDOWN_MS = 675;
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
@@ -47,12 +48,18 @@ export class MyRoom extends Room<MyRoomState> {
           player.y += velocity;
         }
 
-        player.isAttacking = input.attack;
+        // Check if enough time has passed since last attack
+        const currentTime = Date.now();
+        const timeSinceLastAttack = currentTime - player.lastAttackTime;
+        const canAttack = timeSinceLastAttack >= ATTACK_COOLDOWN_MS;
 
-        if (input.attack) {
+        if (input.attack && canAttack) {
+          player.isAttacking = true;
           player.attackCount++;
-
+          player.lastAttackTime = currentTime;
           RESULTS[sessionId].attackCount++;
+        } else {
+          player.isAttacking = false;
         }
       }
     });

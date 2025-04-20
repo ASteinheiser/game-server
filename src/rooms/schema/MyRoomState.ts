@@ -6,6 +6,7 @@ export class Player extends Schema {
   @type("number") y: number;
   @type("boolean") isAttacking: boolean = false;
   @type("number") attackCount: number = 0;
+  @type("number") lastAttackTime: number = 0;
   inputQueue: Array<InputPayload> = [];
 }
 
