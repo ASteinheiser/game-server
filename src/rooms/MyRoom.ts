@@ -4,8 +4,13 @@ import { MyRoomState, Player, InputPayload } from "./schema/MyRoomState";
 // TODO: fix this. Currrent solution is basically mocking a DB
 export const RESULTS: Record<string, { username: string; attackCount: number }> = {};
 
-// attack animation takes 0.675 seconds total (5 frames at 8fps)
-export const ATTACK_COOLDOWN_MS = 675;
+// attack animation takes 0.625 seconds total (5 frames at 8fps)
+const ATTACK_COOLDOWN = 625;
+// attack damage frame is at .375 seconds (frame 3 / 5)
+const ATTACK_DAMAGE_DELAY = 375;
+// time it takes for one frame in the attack animation (8fps)
+const ATTACK_FRAME_TIME = 125;
+const ATTACK_DAMAGE_END = ATTACK_DAMAGE_DELAY + ATTACK_FRAME_TIME;
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
@@ -43,7 +48,12 @@ export class MyRoom extends Room<MyRoomState> {
         // Check if enough time has passed since last attack
         const currentTime = Date.now();
         const timeSinceLastAttack = currentTime - player.lastAttackTime;
-        const canAttack = timeSinceLastAttack >= ATTACK_COOLDOWN_MS;
+        const canAttack = timeSinceLastAttack >= ATTACK_COOLDOWN;
+
+        // find the damage frame in the attack animation
+        if (timeSinceLastAttack >= ATTACK_DAMAGE_DELAY && timeSinceLastAttack < ATTACK_DAMAGE_END) {
+          console.log('pow!');
+        }
 
         // if the player is mid-attack, don't process any more inputs
         if (!canAttack) {
