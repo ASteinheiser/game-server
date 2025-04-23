@@ -5,6 +5,10 @@ import { MyRoomState, Player, InputPayload, Enemy } from "./schema/MyRoomState";
 // TODO: fix this. Currrent solution is basically mocking a DB
 export const RESULTS: Record<string, { username: string; attackCount: number; killCount: number }> = {};
 
+// map dimensions
+const MAP_WIDTH = 1024;
+const MAP_HEIGHT = 768;
+
 // how fast the player and enemies can move
 const VELOCITY = 2;
 
@@ -116,8 +120,8 @@ export class MyRoom extends Room<MyRoomState> {
 
       const enemy = new Enemy();
       enemy.id = nanoid();
-      enemy.x = Math.random() * 1024;
-      enemy.y = Math.random() * 768;
+      enemy.x = Math.random() * MAP_WIDTH;
+      enemy.y = Math.random() * MAP_HEIGHT;
 
       this.state.enemies.push(enemy);
     }
@@ -128,6 +132,13 @@ export class MyRoom extends Room<MyRoomState> {
 
       enemy.x += randomX * VELOCITY;
       enemy.y += randomY * VELOCITY;
+
+      // keep the enemy in bounds
+      if (enemy.x < 0) enemy.x = 0;
+      else if (enemy.x > MAP_WIDTH) enemy.x = MAP_WIDTH;
+
+      if (enemy.y < 0) enemy.y = 0;
+      else if (enemy.y > MAP_HEIGHT) enemy.y = MAP_HEIGHT;
     });
   }
 
@@ -136,13 +147,11 @@ export class MyRoom extends Room<MyRoomState> {
 
     console.log(`${username} (${client.sessionId}) joined!`);
 
-    const mapWidth = 1024;
-    const mapHeight = 768;
     const player = new Player();
 
     player.username = username;
-    player.x = (Math.random() * mapWidth);
-    player.y = (Math.random() * mapHeight);
+    player.x = Math.random() * MAP_WIDTH;
+    player.y = Math.random() * MAP_HEIGHT;
 
     // place player in the map of players by its sessionId
     // (client.sessionId is unique per connection!)
