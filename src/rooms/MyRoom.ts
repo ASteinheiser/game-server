@@ -37,16 +37,8 @@ export class MyRoom extends Room<MyRoomState> {
       let input: undefined | InputPayload;
       // dequeue player inputs
       while (input = player.inputQueue.shift()) {
-        if (input.left) {
-          player.x -= velocity;
-        } else if (input.right) {
-          player.x += velocity;
-        }
-        if (input.up) {
-          player.y -= velocity;
-        } else if (input.down) {
-          player.y += velocity;
-        }
+        player.x += input.left ? -velocity : input.right ? velocity : 0;
+        player.y += input.up ? -velocity : input.down ? velocity : 0;
 
         // Check if enough time has passed since last attack
         const currentTime = Date.now();
