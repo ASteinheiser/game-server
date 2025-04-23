@@ -70,6 +70,13 @@ export class MyRoom extends Room<MyRoomState> {
         player.x += input.left ? -VELOCITY : input.right ? VELOCITY : 0;
         player.y += input.up ? -VELOCITY : input.down ? VELOCITY : 0;
 
+        // keep the player in bounds
+        if (player.x < 0) player.x = 0;
+        else if (player.x > MAP_WIDTH) player.x = MAP_WIDTH;
+
+        if (player.y < 0) player.y = 0;
+        else if (player.y > MAP_HEIGHT) player.y = MAP_HEIGHT;
+
         // Check if enough time has passed since last attack
         const currentTime = Date.now();
         const timeSinceLastAttack = currentTime - player.lastAttackTime;
