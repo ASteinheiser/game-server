@@ -8,6 +8,7 @@ export class Player extends Schema {
   @type("boolean") isAttacking: boolean = false;
   @type("number") attackCount: number = 0;
   @type("number") lastAttackTime: number = 0;
+  @type("number") killCount: number = 0;
   inputQueue: Array<InputPayload> = [];
   // this is for debugging purposes
   @type("number") attackDamageFrameX: number;

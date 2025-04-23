@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { MyRoomState, Player, InputPayload, Enemy } from "./schema/MyRoomState";
 
 // TODO: fix this. Currrent solution is basically mocking a DB
-export const RESULTS: Record<string, { username: string; attackCount: number }> = {};
+export const RESULTS: Record<string, { username: string; attackCount: number; killCount: number }> = {};
 
 // attack animation takes 0.625 seconds total (5 frames at 8fps)
 const ATTACK_COOLDOWN = 625;
@@ -26,6 +26,7 @@ const ATTACK_OFFSET_Y = 12.5;
 // handles how fast enemies spawn
 const ENEMY_SPAWN_RATE = 2000;
 const MAX_ENEMIES = 10;
+const ENEMY_SIZE = 64;
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
@@ -74,6 +75,20 @@ export class MyRoom extends Room<MyRoomState> {
           // calculate the damage frame
           player.attackDamageFrameX = player.isFacingRight ? player.x + ATTACK_OFFSET_X : player.x - ATTACK_OFFSET_X;
           player.attackDamageFrameY = player.y - ATTACK_OFFSET_Y;
+
+          // check if the attack hit an enemy
+          for (const enemy of this.state.enemies) {
+            if (
+              enemy.x - (ENEMY_SIZE / 2) < player.attackDamageFrameX + (ATTACK_WIDTH / 2) &&
+              enemy.x + (ENEMY_SIZE / 2) > player.attackDamageFrameX - (ATTACK_WIDTH / 2) &&
+              enemy.y - (ENEMY_SIZE / 2) < player.attackDamageFrameY + (ATTACK_HEIGHT / 2) &&
+              enemy.y + (ENEMY_SIZE / 2) > player.attackDamageFrameY - (ATTACK_HEIGHT / 2)
+            ) {
+              this.state.enemies.splice(this.state.enemies.indexOf(enemy), 1);
+              player.killCount++;
+              RESULTS[sessionId].killCount++;
+            }
+          }
         } else {
           player.attackDamageFrameX = undefined;
           player.attackDamageFrameY = undefined;
@@ -124,7 +139,7 @@ export class MyRoom extends Room<MyRoomState> {
     // (client.sessionId is unique per connection!)
     this.state.players.set(client.sessionId, player);
 
-    RESULTS[client.sessionId] = { username, attackCount: 0 };
+    RESULTS[client.sessionId] = { username, attackCount: 0, killCount: 0 };
   }
 
   onLeave(client: Client, _: boolean) {
