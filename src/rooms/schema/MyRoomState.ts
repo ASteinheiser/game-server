@@ -4,10 +4,14 @@ export class Player extends Schema {
   @type("string") username: string;
   @type("number") x: number;
   @type("number") y: number;
+  @type("boolean") isFacingRight: boolean = true;
   @type("boolean") isAttacking: boolean = false;
   @type("number") attackCount: number = 0;
   @type("number") lastAttackTime: number = 0;
   inputQueue: Array<InputPayload> = [];
+  // this is for debugging purposes
+  @type("number") attackDamageFrameX: number;
+  @type("number") attackDamageFrameY: number;
 }
 
 export interface InputPayload {

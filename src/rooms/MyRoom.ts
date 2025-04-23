@@ -12,6 +12,16 @@ const ATTACK_DAMAGE_DELAY = 375;
 const ATTACK_FRAME_TIME = 125;
 const ATTACK_DAMAGE_END = ATTACK_DAMAGE_DELAY + ATTACK_FRAME_TIME;
 
+// TODO: refactor this stuff
+const PLAYER_WIDTH = 47;
+const ATTACK_WIDTH = 6;
+const ATTACK_HEIGHT = 8;
+// offset from the center of the player to the center of the fist,
+// which is at the edge of the player's bounding box
+const ATTACK_OFFSET_X = (PLAYER_WIDTH / 2) - (ATTACK_WIDTH / 2);
+// magic number, this is how high the fist is above the center of the player
+const ATTACK_OFFSET_Y = 12.5;
+
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
   state = new MyRoomState();
@@ -42,6 +52,9 @@ export class MyRoom extends Room<MyRoomState> {
       let input: undefined | InputPayload;
       // dequeue player inputs
       while (input = player.inputQueue.shift()) {
+        if (input.left) player.isFacingRight = false;
+        else if (input.right) player.isFacingRight = true;
+
         player.x += input.left ? -velocity : input.right ? velocity : 0;
         player.y += input.up ? -velocity : input.down ? velocity : 0;
 
@@ -50,9 +63,14 @@ export class MyRoom extends Room<MyRoomState> {
         const timeSinceLastAttack = currentTime - player.lastAttackTime;
         const canAttack = timeSinceLastAttack >= ATTACK_COOLDOWN;
 
-        // find the damage frame in the attack animation
+        // find the damage frames in the attack animation
         if (timeSinceLastAttack >= ATTACK_DAMAGE_DELAY && timeSinceLastAttack < ATTACK_DAMAGE_END) {
-          console.log('pow!');
+          // calculate the damage frame
+          player.attackDamageFrameX = player.isFacingRight ? player.x + ATTACK_OFFSET_X : player.x - ATTACK_OFFSET_X;
+          player.attackDamageFrameY = player.y - ATTACK_OFFSET_Y;
+        } else {
+          player.attackDamageFrameX = undefined;
+          player.attackDamageFrameY = undefined;
         }
 
         // if the player is mid-attack, don't process any more inputs
