@@ -1,5 +1,6 @@
 import { Room, Client } from "@colyseus/core";
-import { MyRoomState, Player, InputPayload } from "./schema/MyRoomState";
+import { nanoid } from 'nanoid';
+import { MyRoomState, Player, InputPayload, Enemy } from "./schema/MyRoomState";
 
 // TODO: fix this. Currrent solution is basically mocking a DB
 export const RESULTS: Record<string, { username: string; attackCount: number }> = {};
@@ -22,11 +23,16 @@ const ATTACK_OFFSET_X = (PLAYER_WIDTH / 2) - (ATTACK_WIDTH / 2);
 // magic number, this is how high the fist is above the center of the player
 const ATTACK_OFFSET_Y = 12.5;
 
+// handles how fast enemies spawn
+const ENEMY_SPAWN_RATE = 2000;
+const MAX_ENEMIES = 10;
+
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
   state = new MyRoomState();
   elapsedTime = 0;
   fixedTimeStep = 1000 / 128;
+  lastEnemySpawnTime = 0;
 
   onCreate (_: any) {
     this.onMessage('playerInput', (client, payload: InputPayload) => {
@@ -86,6 +92,19 @@ export class MyRoom extends Room<MyRoomState> {
         }
       }
     });
+
+    const canSpawn = Date.now() >= (this.lastEnemySpawnTime + ENEMY_SPAWN_RATE);
+
+    if (this.state.enemies.length < MAX_ENEMIES && canSpawn) {
+      this.lastEnemySpawnTime = Date.now();
+
+      const enemy = new Enemy();
+      enemy.id = nanoid();
+      enemy.x = Math.random() * 1024;
+      enemy.y = Math.random() * 768;
+
+      this.state.enemies.push(enemy);
+    }
   }
 
   onJoin(client: Client, options: any) {

@@ -29,6 +29,9 @@ importers:
       express:
         specifier: ^4.18.2
         version: 4.21.2
+      nanoid:
+        specifier: ^5.1.5
+        version: 5.1.5
     devDependencies:
       '@colyseus/loadtest':
         specifier: ^0.16.0
@@ -981,6 +984,11 @@ packages:
 
   nanoid@2.1.11:
     resolution: {integrity: sha512-s/snB+WGm6uwi0WjsZdaVcuf3KJXlfGl2LcxgwkEwJF0D/BWzVWAZW/XY4bFaiR7s0Jk3FPvlnepg1H1b1UwlA==}
+
+  nanoid@5.1.5:
+    resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
 
   negotiator@0.6.3:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
@@ -2336,6 +2344,8 @@ snapshots:
     optional: true
 
   nanoid@2.1.11: {}
+
+  nanoid@5.1.5: {}
 
   negotiator@0.6.3: {}
 
