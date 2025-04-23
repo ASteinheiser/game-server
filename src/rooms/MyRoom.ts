@@ -5,6 +5,9 @@ import { MyRoomState, Player, InputPayload, Enemy } from "./schema/MyRoomState";
 // TODO: fix this. Currrent solution is basically mocking a DB
 export const RESULTS: Record<string, { username: string; attackCount: number; killCount: number }> = {};
 
+// how fast the player and enemies can move
+const VELOCITY = 2;
+
 // attack animation takes 0.625 seconds total (5 frames at 8fps)
 const ATTACK_COOLDOWN = 625;
 // attack damage frame is at .375 seconds (frame 3 / 5)
@@ -53,8 +56,6 @@ export class MyRoom extends Room<MyRoomState> {
   }
 
   fixedTick(_: number) {
-    const velocity = 2;
-
     this.state.players.forEach((player, sessionId) => {
       let input: undefined | InputPayload;
       // dequeue player inputs
@@ -62,8 +63,8 @@ export class MyRoom extends Room<MyRoomState> {
         if (input.left) player.isFacingRight = false;
         else if (input.right) player.isFacingRight = true;
 
-        player.x += input.left ? -velocity : input.right ? velocity : 0;
-        player.y += input.up ? -velocity : input.down ? velocity : 0;
+        player.x += input.left ? -VELOCITY : input.right ? VELOCITY : 0;
+        player.y += input.up ? -VELOCITY : input.down ? VELOCITY : 0;
 
         // Check if enough time has passed since last attack
         const currentTime = Date.now();
@@ -120,6 +121,14 @@ export class MyRoom extends Room<MyRoomState> {
 
       this.state.enemies.push(enemy);
     }
+
+    this.state.enemies.forEach((enemy) => {
+      const randomX = Math.round(Math.random()) * 2 - 1;
+      const randomY = Math.round(Math.random()) * 2 - 1;
+
+      enemy.x += randomX * VELOCITY;
+      enemy.y += randomY * VELOCITY;
+    });
   }
 
   onJoin(client: Client, options: any) {
