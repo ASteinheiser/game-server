@@ -1,13 +1,18 @@
-# Welcome to Colyseus!
+# Game Server
+
+A basic game server made for [demo-game](https://github.com/ASteinheiser/demo-game)
+
+Used as the base for [ts-real-time-online-game-template](https://github.com/ASteinheiser/ts-real-time-online-game-template)
 
 This project has been created using [⚔️ `create-colyseus-app`](https://github.com/colyseus/create-colyseus-app/) - an npm init template for kick starting a Colyseus project in TypeScript.
 
-[Documentation](http://docs.colyseus.io/)
+[Colyseus Docs](http://docs.colyseus.io/)
 
 ## :crossed_swords: Usage
 
 ```
-npm start
+pnpm i
+pnpm start
 ```
 
 ## Structure
